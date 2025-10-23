@@ -29,6 +29,7 @@ public class AlunoService {
 
     @Transactional
     public Aluno deletar(Long id) {
+
         Aluno aluno = buscarPorId(id);
         alunoDAO.deletar(aluno);
         return aluno;
