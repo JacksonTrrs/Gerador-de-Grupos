@@ -1,20 +1,23 @@
 package br.com.sorteio.gerador_grupos.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
 
 @Entity // 1. Diz ao JPA que esta classe é uma tabela no banco de dados
 @Table(name = "alunos") // 2. Opcional: Define o nome da tabela. Se não usar, será "aluno"
 public class Aluno {
 
     @Id // 3. Define que este campo é a chave primária
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 4. O banco de dados vai gerar o ID automaticamente (auto-incremento)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // 4. O banco de dados vai gerar o ID automaticamente (auto-incremento)
     private Long id;
 
     private String nome;
+
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    @JsonIgnoreProperties("alunos") // Ignora o campo "grupo" dentro dos alunos para que não ocorra erro.
+    private Grupo grupo;
 
     // Construtores
     public Aluno() {
@@ -39,5 +42,13 @@ public class Aluno {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
     }
 }
