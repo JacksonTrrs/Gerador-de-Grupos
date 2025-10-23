@@ -7,6 +7,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 @Repository // 1. Marca esta classe como um componente de persistência do Spring
@@ -17,7 +18,22 @@ public class AlunoDAO {
 
     @Transactional // 3. O Spring gerencia a transação (begin, commit, rollback)
     public void salvar(Aluno aluno) {
-        entityManager.persist(aluno); // 4. O método persist() salva uma nova entidade
+
+        // 1. Criar a query para buscar um aluno pelo nome
+        TypedQuery<Long> query = entityManager.createQuery(
+                "SELECT COUNT(a) FROM Aluno a WHERE a.nome = :nome", Long.class);
+        query.setParameter("nome", aluno.getNome());
+
+        // 2. Executar a consulta para verificar se já existe algum aluno com esse nome
+        Long count = query.getSingleResult();
+
+        if (count > 0) {
+            // 3. Lançar uma exceção para interromper o cadastro
+            throw new IllegalArgumentException("Já existe um aluno cadastrado com o nome: " + aluno.getNome());
+        }
+
+        // 4. O metodo persist() salva uma nova entidade, se o nome não for duplicado
+        entityManager.persist(aluno);
     }
 
     public List<Aluno> listarTodos() {
@@ -32,6 +48,7 @@ public class AlunoDAO {
 
     @Transactional
     public void deletar(Aluno aluno) {
+
         entityManager.remove(aluno);
     }
 }
